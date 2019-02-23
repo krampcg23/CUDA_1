@@ -23,7 +23,8 @@ int main(int argc, char* argv[]) {
     file >> row >> col;
 
     int** A = new int*[row];
-    for (int i = 0; i < row; i++) A[i] = new int[col];
+    A[0] = new int[row * col];
+    for (int i = 1; i < row; ++i) A[i] = A[i-1] + col;
 
     for (int i = 0; i < row; i++) {
         for (int j = 0; j < col; j++) {
@@ -32,17 +33,15 @@ int main(int argc, char* argv[]) {
             A[i][j] = element;
         }
     }
-    
+
     file.close();
 
     int count = countOnes(A, row, col);
 
     cout << "There are " << count << "  ones in this matrix" << endl;
 
-    for(int i = 0; i < row; ++i) {
-            delete [] A[i];
-    }
-    delete [] A;
+    delete A[0];
+    delete A;
 
     return 0;
 }
