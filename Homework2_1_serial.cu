@@ -20,7 +20,7 @@ int main(int argc, char* argv[]) {
     }
     ifstream file(argv[1]);
     int row, col;
-    file >> row >> col;
+    file >> col >> row;
 
     int** A = new int*[row];
     A[0] = new int[row * col];
