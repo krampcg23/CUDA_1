@@ -1,9 +1,13 @@
+/* CSCI 563 Programming Assignment 2
+   Clayton Kramp
+*/
+
 #include <iostream>
 #include <fstream>
 
 using namespace std;
 
-
+// Main Device Function to be used to count number of ones
 __global__ void countOnes(int* A, int* count, int row, int col) {
 
     int j = blockIdx.x * blockDim.x + threadIdx.x;
@@ -11,6 +15,7 @@ __global__ void countOnes(int* A, int* count, int row, int col) {
 
     if (i >= row || j >= col) return;
     if (A[i * col + j] == 1) {
+        // Atomic addition for race conditions
         atomicAdd(count, 1);
     }
 }
@@ -32,6 +37,7 @@ int main(int argc, char* argv[]) {
     A[0] = new int[row*col];
     for (int i = 1; i < row; i++) A[i] = A[i-1] + col;
 
+    // Fill in Host Array A
     for (int i = 0; i < row; i++) {
         for (int j = 0; j < col; j++) {
             int element;
@@ -45,11 +51,13 @@ int main(int argc, char* argv[]) {
     int* count = new int;
     *count = 0;
 
+    // Copy memory to device array deviceA
     int* deviceA;
     int bytes = row * col * sizeof(int);
     cudaMalloc(&deviceA, bytes);
     cudaMemcpy(deviceA, A[0], bytes, cudaMemcpyHostToDevice);
 
+    // Copy deviceCount
     int* deviceCount;
     cudaMalloc(&deviceCount, 4);
     cudaMemcpy(deviceCount, count, 4, cudaMemcpyHostToDevice);
@@ -58,9 +66,11 @@ int main(int argc, char* argv[]) {
     dim3 numBlocks((col + threadsPerBlock.x-1) / threadsPerBlock.x,
                    (row + threadsPerBlock.y-1) / threadsPerBlock.y, 1);
 
+    // Launch the program
     countOnes<<<numBlocks, threadsPerBlock>>>(deviceA, deviceCount, row, col);
     //cudaDeviceSynchronize();
 
+    // Copy back from device the deviceCount
     cudaMemcpy(count, deviceCount, 4, cudaMemcpyDeviceToHost);
 
     cout << *count << endl;
