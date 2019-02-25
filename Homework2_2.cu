@@ -19,6 +19,10 @@ int main(int argc, char* argv[]) {
         return -1;
     }
     ifstream file(argv[1]);
+    if (!file.good()) {
+        cerr << "Bad input" << endl;
+        return -1;
+    }
     int row, col;
     file >> col >> row;
 

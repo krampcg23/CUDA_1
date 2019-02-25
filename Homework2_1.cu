@@ -21,6 +21,10 @@ int main(int argc, char* argv[]) {
         return -1;
     }
     ifstream file(argv[1]);
+    if (!file.good()) {
+        cerr << "Bad input" << endl;
+        return -1;
+    }
     int row, col;
     file >> col >> row;
 
@@ -59,7 +63,7 @@ int main(int argc, char* argv[]) {
 
     cudaMemcpy(count, deviceCount, 4, cudaMemcpyDeviceToHost);
 
-    cout << "There are " << *count << " ones in this matrix" << endl;
+    cout << *count << endl;
 
     delete A[0];
     delete A;
